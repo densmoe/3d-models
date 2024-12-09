@@ -1,0 +1,14 @@
+{
+  "name": "smoke-detector",
+  "version": "1.0.0",
+  "main": "smoke-detector.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@jscad/cli": "^2.3.4"
+  }
+}
