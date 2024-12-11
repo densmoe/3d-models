@@ -1,57 +1,49 @@
 const { polygon } = require('@jscad/modeling').primitives;
-const { extrudeRotate } = require('@jscad/modeling').extrusions;
-const { translate } = require('@jscad/modeling').transforms;
+const { extrudeLinear } = require('@jscad/modeling').extrusions;
 const { snap } = require('@jscad/modeling').modifiers;
+const { expand } = require('@jscad/modeling').expansions;
+const { mirrorX } = require('@jscad/modeling').transforms; // Use mirrorX for clarity
+const { union } = require('@jscad/modeling').booleans;
 
 const main = () => {
-    const gapSize = 5;
-    const gapLength = 300;
+  const gapWidth = 17.5;
+  const gapLength = 10;
+  const gapDepth = 18;
+  const bridgePillarThickness = 4;
+  const bridgeThickness = 1;
+  const bridgeOverhang = 10;
 
-    const bridge = polygon({
-        points: [
-            [0, 0],
-            [gapSize, 0],
-            [gapSize, gapLength],
-            [0, gapLength]
-        ]
-    });
-
-    
-  // Define parameters
-  let outerHeight = 9;
-  let outerDiameter = 60;
-  let innerHeight = 7;
-  let innerDiameter = 41.5;
-  let topRimThickness = 3;
-
-  // Computed values
-  let innerRadius = innerDiameter / 2;
-  let outerRadius = outerDiameter / 2;
-  let bottomPadding = outerHeight - innerHeight;
-
-
-  // Define a custom polygon shape with snapped points (e.g., a triangle)
-  const myPolygon = polygon({
+  // Define half of the bridge profile
+  const halfBridge = polygon({
     points: [
-      [0,0], 
-      [outerRadius ,0], 
-      [outerRadius, bottomPadding],
-      [innerRadius + topRimThickness, outerHeight],
-      [innerRadius, outerHeight],
-      [innerRadius, bottomPadding],
-      [0,bottomPadding]
-    ]
+      [gapWidth / 2 - bridgePillarThickness, 0],
+      [gapWidth / 2, 0],
+      [gapWidth / 2, gapDepth],
+      [gapWidth / 2 + bridgeOverhang, gapDepth],
+      [gapWidth / 2 + bridgeOverhang, gapDepth + bridgeThickness],
+      [0, gapDepth + bridgeThickness],
+      [0, gapDepth],
+      [gapWidth / 2 - bridgePillarThickness, gapDepth],
+    ],
   });
 
-  // Optionally, move the polygon to align better with the rotation axis
-  const movedPolygon = myPolygon;
+  // Perform a linear extrusion to create the 3D bridge
+  const extrudedHalfBridge = extrudeLinear({
+    height: gapLength, // Extrude along the Z-axis
+  }, halfBridge);
 
-  // Perform a rotational extrusion (circular extrusion)
-  const myRotatedExtrusion = extrudeRotate({
-    segments: 64, // Number of segments for smoothness
-  }, movedPolygon);
+  // Mirror the half-bridge to create the full bridge profile
+  const mirroredHalf = mirrorX(extrudedHalfBridge);
+  const fullBridge = union(extrudedHalfBridge, mirroredHalf); // Combine halves
 
-  return snap([0.1], myRotatedExtrusion);
+  // Add rounded corners to the full bridge profile
+  const polyWithFillets = expand({
+    delta: 0.5,         // Distance of offset
+    corners: 'round',   // Use 'round' for fillets
+  }, fullBridge);
+
+  // Ensure the output is manifold for slicing
+  return snap(0.1, polyWithFillets);
 };
 
 module.exports = { main };
