@@ -6,12 +6,15 @@ const { mirrorX } = require('@jscad/modeling').transforms; // Use mirrorX for cl
 const { union } = require('@jscad/modeling').booleans;
 
 const main = () => {
-  const gapWidth = 17.5;
-  const gapLength = 10;
+  const gapWidth = 18;
+  const gapLength = 15;
   const gapDepth = 18;
   const bridgePillarThickness = 4;
-  const bridgeThickness = 1;
+  const bridgeMinThickness = 1;
+  const bridgeMaxThickness = 3;
   const bridgeOverhang = 10;
+  const bridgePeakXOffset = 6;
+  const bridgeInnerPadding = 4;
 
   // Define half of the bridge profile
   const halfBridge = polygon({
@@ -20,10 +23,11 @@ const main = () => {
       [gapWidth / 2, 0],
       [gapWidth / 2, gapDepth],
       [gapWidth / 2 + bridgeOverhang, gapDepth],
-      [gapWidth / 2 + bridgeOverhang, gapDepth + bridgeThickness],
-      [0, gapDepth + bridgeThickness],
-      [0, gapDepth],
-      [gapWidth / 2 - bridgePillarThickness, gapDepth],
+      [gapWidth / 2 + bridgeOverhang, gapDepth + bridgeMinThickness],
+      [gapWidth / 2 + bridgeOverhang - bridgePeakXOffset, gapDepth + bridgeMaxThickness],
+      [0, gapDepth + bridgeMaxThickness],
+      [0, gapDepth - bridgeInnerPadding],
+      [gapWidth / 2 - bridgePillarThickness, gapDepth - bridgeInnerPadding],
     ],
   });
 
@@ -43,7 +47,7 @@ const main = () => {
   }, fullBridge);
 
   // Ensure the output is manifold for slicing
-  return snap(0.1, polyWithFillets);
+  return snap(0.1, fullBridge);
 };
 
 module.exports = { main };
