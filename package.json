@@ -1,7 +1,6 @@
 {
-  "name": "smoke-detector",
+  "name": "3d-models",
   "version": "1.0.0",
-  "main": "smoke-detector.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
