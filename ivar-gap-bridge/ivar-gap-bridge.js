@@ -6,14 +6,14 @@ const { mirrorX } = require('@jscad/modeling').transforms; // Use mirrorX for cl
 const { union } = require('@jscad/modeling').booleans;
 
 const main = () => {
-  const gapWidth = 18;
-  const gapLength = 15;
+  const gapWidth = 16;
+  const gapLength = 233;
   const gapDepth = 18;
   const bridgePillarThickness = 4;
   const bridgeMinThickness = 1;
   const bridgeMaxThickness = 3;
   const bridgeOverhang = 10;
-  const bridgePeakXOffset = 6;
+  const bridgePeakXOffset = 5;
   const bridgeInnerPadding = 4;
 
   // Define half of the bridge profile
